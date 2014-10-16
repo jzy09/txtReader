@@ -23,7 +23,9 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".ViewPage" android:label="@string/swich_code">
+		<activity android:name=".ViewPage"
+		          android:label="@string/swich_code"
+		          android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 			<intent-filter>
 				<action android:name="com.ostrichmyself.txtReader.ViewPage" />
 				<category android:name="android.intent.category.DEFAULT" />
