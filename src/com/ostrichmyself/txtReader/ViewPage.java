@@ -83,7 +83,7 @@ public class ViewPage extends Activity {
 		// TODO Auto-generated method stub
 		initCanvas();
 		preparePage();
-		readPage(curPos);
+		//readPage(curPos);
 	}
 	
 	private void readPage(long pos) throws IOException {
@@ -91,22 +91,32 @@ public class ViewPage extends Activity {
 		Log.d(TAG, "readPage!");
 		clearCanvas();
 		
-		int x=0, y=0;
+		int x=0, y=50;
 		String myText = convertStreamToString(pos);
 		Log.d(TAG, "readPage! 22");
 		String temp;
 		int start = 0;
 		int end = start + maxRowNum;
-		for (int i = 0; i < 9; i++){
+		for (int i = 0; i < maxColumeNum; i++){
 			Log.d(TAG, "readPage! i : " + i);
 			temp = myText.substring(start, end);
+			int lineEnd = temp.indexOf("\n");
+			Log.d(TAG, "readPage lineEnd : " + lineEnd);
+			if(lineEnd != -1) {
+				Log.d(TAG, "readPage temp 11: " + temp);
+				temp = temp.substring(0, lineEnd);
+				Log.d(TAG, "readPage temp 22: " + temp);
+				start += lineEnd + 1;
+			} else {
+				start += maxRowNum;
+			}
+			Log.d(TAG, "readPage temp 33: " + temp);
 			canvas.drawText(temp, x, y, paint);
-			start += maxRowNum;
-			end += maxRowNum;
-			y += wordSize;
+			end = start + maxRowNum;
+			y += wordSize * 1.5;
 			Log.d(TAG, "readPage! i : " + i);
 		}
-		Log.d(TAG, "chux 000");
+		Log.d(TAG, "chux 000 w: "+bitmap.getWidth()+" h: "+bitmap.getHeight());
         page.setImageBitmap(bitmap);
         Log.d(TAG, "chux 111");
 	}
@@ -156,7 +166,7 @@ public class ViewPage extends Activity {
 
 	private String convertStreamToString(long pos) throws IOException {
 		// TODO Auto-generated method stub
-		byte[] b = new byte [maxWordNumPerPage];
+		byte[] b = new byte [2000];
 		int i = is.read(b);
 		is.skip(curPos);
 		
