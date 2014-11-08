@@ -3,8 +3,6 @@ package com.ostrichmyself.txtReader;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.util.EncodingUtils;
-
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -22,7 +20,6 @@ import android.widget.ImageView;
 
 public class ViewPage extends Activity {
 	private final String TAG = "ViewPage";
-	private static final String defaultCode = "UTF-8";
 	
 	private int width = 0;    //page width
 	private int height = 0;  //page height 
@@ -35,16 +32,12 @@ public class ViewPage extends Activity {
 	private Bitmap bitmap;
 	private Canvas canvas;
 	private Paint paint;
-	private InputStream is;
-	private Resources src;
-	
-	private long curPos;
+	private TxtSource txtSrc;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.viewpage);
-		curPos = 0;
 	    
 	    Thread t = new Thread(new Runnable(){
 
@@ -83,42 +76,28 @@ public class ViewPage extends Activity {
 		// TODO Auto-generated method stub
 		initCanvas();
 		preparePage();
-		//readPage(curPos);
 	}
 	
 	private void readPage(long pos) throws IOException {
 		// TODO Auto-generated method stub
-		Log.d(TAG, "readPage!");
+		Log.d(TAG, "readPage on pos : " + pos);
 		clearCanvas();
 		
-		int x=0, y=50;
-		String myText = convertStreamToString(pos);
-		Log.d(TAG, "readPage! 22");
-		String temp;
-		int start = 0;
-		int end = start + maxRowNum;
-		for (int i = 0; i < maxColumeNum; i++){
-			Log.d(TAG, "readPage! i : " + i);
-			temp = myText.substring(start, end);
-			int lineEnd = temp.indexOf("\n");
-			Log.d(TAG, "readPage lineEnd : " + lineEnd);
-			if(lineEnd != -1) {
-				Log.d(TAG, "readPage temp 11: " + temp);
-				temp = temp.substring(0, lineEnd);
-				Log.d(TAG, "readPage temp 22: " + temp);
-				start += lineEnd + 1;
-			} else {
-				start += maxRowNum;
-			}
-			Log.d(TAG, "readPage temp 33: " + temp);
-			canvas.drawText(temp, x, y, paint);
-			end = start + maxRowNum;
-			y += wordSize * 1.5;
-			Log.d(TAG, "readPage! i : " + i);
+		if (pos != 0){
+			txtSrc.read(0, 0, 2000);
 		}
-		Log.d(TAG, "chux 000 w: "+bitmap.getWidth()+" h: "+bitmap.getHeight());
+
+		int x=0, y=50;
+		String tempStr;
+		while (y + wordSize < height){
+			tempStr = txtSrc.getLine();
+			if (tempStr == null) {
+				return;
+			}
+			canvas.drawText(tempStr, x, y, paint);
+			y += wordSize * 1.5;
+		}
         page.setImageBitmap(bitmap);
-        Log.d(TAG, "chux 111");
 	}
 
 	private void clearCanvas() {
@@ -129,17 +108,18 @@ public class ViewPage extends Activity {
 	    paint2.setXfermode(new PorterDuffXfermode(Mode.SRC));  
 	}
 
-	private void preparePage() {
+	private void preparePage() throws IOException {
 		// TODO Auto-generated method stub
-		src = this.getResources();
-		is = (InputStream) src.openRawResource(R.raw.duo);
+		Resources src = this.getResources();
+		InputStream is = (InputStream) src.openRawResource(R.raw.duo);
 		page = (ImageView) findViewById(R.id.page);
+		txtSrc = new TxtSource(is, maxRowNum);
         page.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				try {
-					readPage(curPos);
+					readPage(0);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -162,21 +142,5 @@ public class ViewPage extends Activity {
 		maxWordNumPerPage = maxColumeNum * maxRowNum;
 		Log.d(TAG, "maxColumeNum:" + maxColumeNum + " maxRowNum:" + maxRowNum
 				+ " maxWordNumPerPage:" + maxWordNumPerPage);
-	}
-
-	private String convertStreamToString(long pos) throws IOException {
-		// TODO Auto-generated method stub
-		byte[] b = new byte [2000];
-		int i = is.read(b);
-		is.skip(curPos);
-		
-		if (i == -1) {
-			return null;
-		}
-		
-		String res = EncodingUtils.getString(b, defaultCode);
-		
-		curPos += maxWordNumPerPage;
-		return res;
 	}
 }
