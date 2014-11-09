@@ -122,7 +122,7 @@ public class ViewPage extends Activity {
 					e.printStackTrace();
 				}
 			}
-        });*/
+		});*/
 	}
 
 	private void initCanvas() {
