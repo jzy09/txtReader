@@ -1,10 +1,7 @@
 package com.ostrichmyself.txtReader;
 
 import java.io.IOException;
-import java.io.InputStream;
-
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -14,9 +11,9 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.MotionEvent;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class ViewPage extends Activity {
 	private final String TAG = "ViewPage";
@@ -27,12 +24,15 @@ public class ViewPage extends Activity {
 	private int maxRowNum = 0;   //display text number each line
 	private int maxColumeNum = 0;
 	private int maxWordNumPerPage = 0;
+	private int halfwidth;
 	
 	private ImageView page;
 	private Bitmap bitmap;
 	private Canvas canvas;
 	private Paint paint;
 	private TxtSource txtSrc;
+	
+	private boolean pagePending = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -43,13 +43,11 @@ public class ViewPage extends Activity {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				int res = waitForLayoutComplete();
 				if (res == 0){
 					try {
 						startRead();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}					
@@ -59,12 +57,12 @@ public class ViewPage extends Activity {
 	}
 
 	protected int waitForLayoutComplete() {
-		// TODO Auto-generated method stub
 		ImageView im = (ImageView)findViewById(R.id.page);
 		while(true){
 			if (im.getWidth() > 0){
 				width = im.getWidth();
 				height = im.getHeight();
+				halfwidth = width/2;
 				Log.d(TAG, "The page width : " + width + " height : " + height);
 				break;
 			}
@@ -73,18 +71,19 @@ public class ViewPage extends Activity {
 	}
 
 	protected void startRead() throws IOException {
-		// TODO Auto-generated method stub
 		initCanvas();
 		preparePage();
 	}
 	
 	private void readPage(long pos) throws IOException {
-		// TODO Auto-generated method stub
 		Log.d(TAG, "readPage on pos : " + pos);
 		clearCanvas();
 		
-		if (pos != 0){
-			txtSrc.read(0, 0, 2000);
+		if (pos == 1){
+			int res = txtSrc.read(TxtSource.READ_DIRECTION.BACKWARD, 0);
+			if (res == -1){
+				return;
+			}
 		}
 
 		int x=0, y=50;
@@ -101,7 +100,6 @@ public class ViewPage extends Activity {
 	}
 
 	private void clearCanvas() {
-		// TODO Auto-generated method stub
 	    Paint paint2 = new Paint();  
 	    paint2.setXfermode(new PorterDuffXfermode(Mode.CLEAR));  
 	    canvas.drawPaint(paint2);  
@@ -109,27 +107,25 @@ public class ViewPage extends Activity {
 	}
 
 	private void preparePage() throws IOException {
-		// TODO Auto-generated method stub
-		Resources src = this.getResources();
-		InputStream is = (InputStream) src.openRawResource(R.raw.duo);
 		page = (ImageView) findViewById(R.id.page);
-		txtSrc = new TxtSource(is, maxRowNum);
-        page.setOnClickListener(new OnClickListener(){
+		txtSrc = new TxtSource("/sdcard/txtReader/duo.txt", maxRowNum);
+		if (txtSrc.initFail){
+			String fail = "Source init failed !";
+			Toast.makeText(this, fail, Toast.LENGTH_SHORT).show();
+		}
+		/*page.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				try {
 					readPage(0);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-        });
+        });*/
 	}
 
 	private void initCanvas() {
-		// TODO Auto-generated method stub
 		bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 		canvas = new Canvas(bitmap);
 		
@@ -142,5 +138,44 @@ public class ViewPage extends Activity {
 		maxWordNumPerPage = maxColumeNum * maxRowNum;
 		Log.d(TAG, "maxColumeNum:" + maxColumeNum + " maxRowNum:" + maxRowNum
 				+ " maxWordNumPerPage:" + maxWordNumPerPage);
+	}
+	
+	public boolean onTouchEvent(MotionEvent event){
+		//String s = "x:" + (event.getX() + " y:"+ event.getY());
+		//Log.d(TAG, s);
+		//Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+		switch (event.getAction()){
+		case MotionEvent.ACTION_DOWN:
+			break;
+		case MotionEvent.ACTION_UP:
+			if (pagePending) {
+				break;
+			}
+			pagePending = true;
+			if(event.getX() < halfwidth){
+				readPrePage();
+			} else{
+				readNextPage();
+			}
+			pagePending = false;
+			break;
+		}
+		return super.onTouchEvent(event); 
+	}
+
+	private void readPrePage() {
+		try {
+			readPage(1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readNextPage(){
+		try {
+			readPage(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
