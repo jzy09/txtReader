@@ -113,6 +113,7 @@ public class ViewPage extends Activity {
 			String fail = "Source init failed !";
 			Toast.makeText(this, fail, Toast.LENGTH_SHORT).show();
 		}
+		txtSrc.setMaxColumeNum(14);
 		/*page.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
