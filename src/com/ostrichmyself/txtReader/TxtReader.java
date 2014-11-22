@@ -34,7 +34,7 @@ public class TxtReader extends Activity {
         setContentView(R.layout.booklist);
         
         ListView booklist = (ListView) this.findViewById(R.id.booklist);
-        ArrayAdapter arraydapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getData());
+        ArrayAdapter<String> arraydapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getData());
         booklist.setAdapter(arraydapter);
         
         booklist.setOnItemClickListener(new OnItemClickListener() {
@@ -81,8 +81,10 @@ public class TxtReader extends Activity {
 		
 		for(int i = 0; i < files.length; i++){
 			String filename = files[i];
+			Log.d(TAG, "filename : " + filename);
 			File outFile = new File(des, filename);
 			if (outFile.exists()){
+				Log.d(TAG, "filename : " + filename + "is exist");
 				continue;
 			}
 			

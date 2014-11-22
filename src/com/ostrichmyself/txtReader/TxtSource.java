@@ -73,6 +73,7 @@ public class TxtSource {
 				res = raf.read(buffer);
 				raf.seek(bufferEndFilePos);
 			} else {
+				Log.d(TAG, "The page is the first page!");
 				return res;
 			}
 		}
@@ -114,13 +115,13 @@ public class TxtSource {
 				strBufferIndex += maxRowNum;
 			}
 		}
-		Log.d(TAG, "222list strBufferList len : " + strBufferList.size() + " strBufferList2: "+ strBufferList2.size());
+		//Log.d(TAG, "222list strBufferList len : " + strBufferList.size() + " strBufferList2: "+ strBufferList2.size());
 		if (which == 0){
 			strBufferList.addAll(strBufferList2);
 		} else if (which == 1) {
 			strBufferList.addAll(0, strBufferList2);
 		}
-		Log.d(TAG, "22list strBufferList len : " + strBufferList.size() + " strBufferList2: "+ strBufferList2.size());
+		//Log.d(TAG, "22list strBufferList len : " + strBufferList.size() + " strBufferList2: "+ strBufferList2.size());
 		
 		return res;
 	}
@@ -134,9 +135,12 @@ public class TxtSource {
 			Log.d(TAG, strBufferListCurIndex + " " + maxColumeNum);
 			if (strBufferListCurIndex < (maxColumeNum * 2)){
 				int size = strBufferList.size();
-				updateBuffer(1);
-				Log.d(TAG, size + " " +  strBufferList.size() + " " + strBufferListCurIndex + " " + maxColumeNum);
-				strBufferListCurIndex += strBufferList.size() - size - maxColumeNum * 2;
+				if (updateBuffer(1) == -1){
+					return -1;
+				} else {
+					Log.d(TAG, size + " " +  strBufferList.size() + " " + strBufferListCurIndex + " " + maxColumeNum);
+					strBufferListCurIndex += strBufferList.size() - size - maxColumeNum * 2;
+				}
 			} else {
 				strBufferListCurIndex -= maxColumeNum * 2;
 			}
