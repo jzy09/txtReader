@@ -11,12 +11,20 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 /**
  * ���ı������
@@ -27,18 +35,73 @@ public class TxtReader extends Activity {
     /** Called when the activity is first created. */
 	private final static String TAG = "TxtReader";
 	private Bundle bundle;
+	private ImageView startImg;
+	private LinearLayout allList;
+	private Handler myhandler;
+	private TextView imenuDefault;
+	private TextView imenuLocalFile;
+	private TextView imenuAbout;
+	private LinearLayout defaultList;
+	private TextView localFile;
+	private TextView about;
+	
+	private final int AFTERSTARTIMG = 0;
 		
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.booklist);
         
+        allList = (LinearLayout) this.findViewById(R.id.allList);      
+        startImg = (ImageView) this.findViewById(R.id.startimg);
+    	imenuDefault = (TextView) this.findViewById(R.id.menuDefaultList);
+    	imenuLocalFile = (TextView) this.findViewById(R.id.menuLocalList);
+    	imenuAbout = (TextView) this.findViewById(R.id.menuAbout);
+    	defaultList = (LinearLayout) this.findViewById(R.id.defaultList);
+    	localFile = (TextView) this.findViewById(R.id.localFile);
+    	about = (TextView) this.findViewById(R.id.about);
+        
+        allList.setVisibility(View.GONE);	//View.VISIBLE
+        defaultList.setVisibility(View.GONE);
+        localFile.setVisibility(View.GONE);
+        about.setVisibility(View.GONE);
+        
+        imenuDefault.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Log.d(TAG, "click 1st menu");
+				defaultList.setVisibility(View.VISIBLE);
+		        localFile.setVisibility(View.GONE);
+		        about.setVisibility(View.GONE);
+			}
+        });
+        
+        imenuLocalFile.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Log.d(TAG, "click 2nd menu");
+				defaultList.setVisibility(View.GONE);
+		        localFile.setVisibility(View.VISIBLE);
+		        about.setVisibility(View.GONE);
+			}
+        });
+        
+        imenuAbout.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Log.d(TAG, "click 3rd menu");
+				defaultList.setVisibility(View.GONE);
+		        localFile.setVisibility(View.GONE);
+		        about.setVisibility(View.VISIBLE);
+			}
+        });
+        
+        
         ListView booklist = (ListView) this.findViewById(R.id.booklist);
         ArrayAdapter<String> arraydapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, getData());
         booklist.setAdapter(arraydapter);
         
         booklist.setOnItemClickListener(new OnItemClickListener() {
-
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
@@ -56,8 +119,34 @@ public class TxtReader extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+        
+        myhandler = new Handler(){
+        	public void handleMessage(Message msg) {
+        		switch (msg.what) {
+        		case AFTERSTARTIMG:
+        			startImg.setVisibility(View.GONE);
+        	        allList.setVisibility(View.VISIBLE);
+        	        defaultList.setVisibility(View.VISIBLE);
+        			break;   
+                }   
+                super.handleMessage(msg);   
+           }
+        };
+        
+        Thread t = new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				SystemClock.sleep(3000);
+				Message message = new Message();
+				message.what = AFTERSTARTIMG;
+				myhandler.sendMessage(message);
+		        
+			}});
+	    
+	    t.start();
     }
-    
+
 	private void copyAssetsToSdcard(String DesPath) throws IOException {
 		// Check the dest path exit and judge if it needs to copy.
 		File des = new File(DesPath);

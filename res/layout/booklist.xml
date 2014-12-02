@@ -1,21 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
     
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="古龙全集" />
-    
-    <ListView 
-        android:id="@+id/booklist"
+    <ImageView 
+        android:id="@+id/startimg"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:drawSelectorOnTop="true"
-    />
+        android:src="@drawable/start"
+        />
     
-
-</LinearLayout>
+ 	<LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:orientation="vertical"
+    	android:id="@+id/allList">
+    	
+ 	    <LinearLayout
+ 	        android:layout_width="fill_parent"
+ 	        android:layout_height="50px"
+ 	        android:orientation="horizontal"
+ 	        android:id="@+id/menuList"
+ 	        android:background="#FF00FF00"
+ 	        >
+ 	        
+ 	        <TextView
+ 	            android:id="@+id/menuDefaultList"
+ 	       		android:layout_width="fill_parent"
+ 	            android:layout_height="fill_parent"
+ 	            android:layout_weight="1"
+ 	            android:textSize="40px"
+ 	            android:text="默认"
+ 	            android:gravity="center"
+ 	            />
+ 	        <TextView
+ 	            android:id="@+id/menuLocalList"
+ 	       		android:layout_width="fill_parent"
+ 	            android:layout_height="fill_parent"
+ 	            android:layout_weight="1"
+ 	            android:textSize="40px"
+ 	            android:text="本地文件"
+ 	            android:gravity="center"
+ 	            />
+ 	        <TextView
+ 	            android:id="@+id/menuAbout"
+ 	       		android:layout_width="fill_parent"
+ 	            android:layout_height="fill_parent"
+ 	            android:layout_weight="1"
+ 	            android:textSize="40px"
+ 	            android:text="关于"
+ 	            android:gravity="center"
+ 	            />
+ 	    </LinearLayout>
+ 	    
+ 	    <FrameLayout 
+ 	        android:layout_width="fill_parent"
+    		android:layout_height="fill_parent">
+ 	        <LinearLayout 
+ 	            android:layout_width="fill_parent"
+    			android:layout_height="fill_parent"
+    			android:orientation="vertical"
+    			android:id="@+id/defaultList">
+    			<TextView
+		        	android:layout_width="fill_parent"
+		        	android:layout_height="wrap_content"
+		        	android:textSize="40px"
+		        	android:text="古龙全集" />
+		    
+		    	<ListView 
+			        android:id="@+id/booklist"
+			        android:layout_width="fill_parent"
+			        android:layout_height="fill_parent"
+			        android:layout_weight="1"
+			        android:drawSelectorOnTop="true"/>
+ 	        </LinearLayout>
+ 	        
+ 	        <TextView 
+ 	            android:id="@+id/localFile"
+ 	            android:layout_width="fill_parent"
+ 	            android:layout_height="fill_parent"
+ 	            android:textSize="40px"
+ 	            android:text="Waiting ..."
+ 	            android:gravity="center"/>
+ 	        
+ 	        <TextView 
+ 	            android:id="@+id/about"
+ 	            android:layout_width="fill_parent"
+ 	            android:layout_height="fill_parent"
+ 	            android:textSize="40px"
+ 	            android:text="words about the maker"
+ 	            android:gravity="center"/>
+ 	    </FrameLayout>
+	</LinearLayout>
+</FrameLayout>
