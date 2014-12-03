@@ -31,6 +31,7 @@ public class ViewPage extends Activity {
 	private Canvas canvas;
 	private Paint paint;
 	private TxtSource txtSrc;
+	private String fileSrcPath = null;
 	
 	private boolean pagePending = false;
 	
@@ -38,6 +39,11 @@ public class ViewPage extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.viewpage);
+		Bundle extras = getIntent().getExtras();
+		fileSrcPath = extras.getString("bookname");
+		if(fileSrcPath == null) {
+			finish();
+		}
 	    
 	    Thread t = new Thread(new Runnable(){
 
@@ -73,6 +79,7 @@ public class ViewPage extends Activity {
 	protected void startRead() throws IOException {
 		initCanvas();
 		preparePage();
+		//readNextPage();
 	}
 	
 	private void readPage(long pos) throws IOException {
@@ -108,7 +115,7 @@ public class ViewPage extends Activity {
 
 	private void preparePage() throws IOException {
 		page = (ImageView) findViewById(R.id.page);
-		txtSrc = new TxtSource("/sdcard/txtReader/duo.txt", maxRowNum);
+		txtSrc = new TxtSource(fileSrcPath, maxRowNum);
 		if (txtSrc.initFail){
 			String fail = "Source init failed !";
 			Toast.makeText(this, fail, Toast.LENGTH_SHORT).show();

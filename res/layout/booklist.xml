@@ -76,13 +76,19 @@
 			        android:drawSelectorOnTop="true"/>
  	        </LinearLayout>
  	        
- 	        <TextView 
- 	            android:id="@+id/localFile"
+ 	        <LinearLayout 
  	            android:layout_width="fill_parent"
- 	            android:layout_height="fill_parent"
- 	            android:textSize="40px"
- 	            android:text="Waiting ..."
- 	            android:gravity="center"/>
+	 	        android:layout_height="fill_parent"
+	 	        android:orientation="vertical"
+	 	        android:id="@+id/localFile"
+	 	        >
+	 	        
+	 	        <ListView 
+			        android:id="@+id/localFilelist"
+			        android:layout_width="fill_parent"
+			        android:layout_height="fill_parent"
+			        android:drawSelectorOnTop="true"/>
+ 	        </LinearLayout>
  	        
  	        <TextView 
  	            android:id="@+id/about"

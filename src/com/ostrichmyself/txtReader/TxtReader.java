@@ -42,10 +42,14 @@ public class TxtReader extends Activity {
 	private TextView imenuLocalFile;
 	private TextView imenuAbout;
 	private LinearLayout defaultList;
-	private TextView localFile;
+	private LinearLayout localFile;
 	private TextView about;
 	
 	private final int AFTERSTARTIMG = 0;
+	private static final String ROOT_PATH = "/";
+	private ArrayList<String> curNames = null;
+	private ArrayList<String> curPaths = null;
+	private String curPath = null;
 		
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +62,7 @@ public class TxtReader extends Activity {
     	imenuLocalFile = (TextView) this.findViewById(R.id.menuLocalList);
     	imenuAbout = (TextView) this.findViewById(R.id.menuAbout);
     	defaultList = (LinearLayout) this.findViewById(R.id.defaultList);
-    	localFile = (TextView) this.findViewById(R.id.localFile);
+    	localFile = (LinearLayout) this.findViewById(R.id.localFile);
     	about = (TextView) this.findViewById(R.id.about);
         
         allList.setVisibility(View.GONE);	//View.VISIBLE
@@ -83,6 +87,7 @@ public class TxtReader extends Activity {
 				defaultList.setVisibility(View.GONE);
 		        localFile.setVisibility(View.VISIBLE);
 		        about.setVisibility(View.GONE);
+		        showFileDir(ROOT_PATH);
 			}
         });
         
@@ -108,7 +113,7 @@ public class TxtReader extends Activity {
 				Log.d(TAG, "click!!!");
 				Intent in = new Intent(TxtReader.this, ViewPage.class);
 				bundle = new Bundle(); //bundle用来在activity中传递数据
-				bundle.putString("bookname", "楚留香");
+				bundle.putString("bookname", "/sdcard/txtReader/duo.txt");
 				in.putExtras(bundle);  //将数据结构放入intent中
 	        	startActivityForResult(in, 0);
 			}
@@ -146,6 +151,62 @@ public class TxtReader extends Activity {
 	    
 	    t.start();
     }
+
+	protected void showFileDir(String path) {
+		// TODO Auto-generated method stub
+		Log.d(TAG, "showFileDir : " + path);
+		if (path == null){
+			return;
+		}
+		
+		curPath = path;
+		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> paths = new ArrayList<String>();
+		curPaths = paths;
+		File file = new File(path);
+		File[] files = file.listFiles();
+		names.add("Back ...");
+		paths.add("/");
+		
+		for (File f : files){
+            names.add(f.getName());
+            paths.add(f.getPath());
+        }
+		
+		ListView localFileList = (ListView) this.findViewById(R.id.localFilelist);
+		ArrayAdapter<String> arraydapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, names);
+		localFileList.setAdapter(arraydapter);
+		
+		localFileList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			//arg1 = touch view; arg2=view index; arg3 = id?
+			public void onItemClick(AdapterView<?> arg0, View v, int position,
+					long id) {
+				Log.d(TAG, "arg2 : " + position + " id : " + id + " curPath :" + curPath);
+				if (position == 0){
+					if (curPath != ROOT_PATH){
+						File file = new File(curPath);
+						showFileDir(file.getParent());
+					}
+				} else {
+					String path = curPaths.get(position);
+					File file = new File(path);
+					if (file.exists() && file.canRead()){
+						if(file.isDirectory()){
+							showFileDir(path);
+						} else {
+							Intent in = new Intent(TxtReader.this, ViewPage.class);
+							bundle = new Bundle(); //bundle用来在activity中传递数据
+							bundle.putString("bookname", path);
+							in.putExtras(bundle);  //将数据结构放入intent中
+				        	startActivityForResult(in, 0);
+						}
+					}
+				}
+			}
+        });
+	}
 
 	private void copyAssetsToSdcard(String DesPath) throws IOException {
 		// Check the dest path exit and judge if it needs to copy.
